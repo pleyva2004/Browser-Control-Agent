@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browser Control Agent</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Browser Control Agent</h1>
+    <div class="header-controls">
+      <span id="status" class="status disconnected">Disconnected</span>
+      <button id="connectBtn">Connect</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="preview-panel">
+      <div class="url-bar">
+        <input
+          type="text"
+          id="urlInput"
+          placeholder="Enter URL..."
+          disabled
+        />
+        <button id="urlGoBtn" disabled>Go</button>
+      </div>
+      <div class="preview-container">
+        <img id="browserPreview" alt="Browser preview" />
+        <div id="previewPlaceholder" class="placeholder">
+          Click Connect to start
+        </div>
+      </div>
+      <div class="preview-toolbar">
+        <button id="micBtn" class="mic-btn" disabled>Mic Off</button>
+        <div class="volume-control">
+          <label for="volumeSlider">Vol</label>
+          <input type="range" id="volumeSlider" min="0" max="100" value="80" />
+        </div>
+      </div>
+    </section>
+
+    <section class="chat-panel">
+      <div id="chatLog" class="chat-log"></div>
+      <div class="chat-input">
+        <input
+          type="text"
+          id="textInput"
+          placeholder="Type a command..."
+          disabled
+        />
+        <button id="sendBtn" disabled>Send</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/agent-client.js"></script>
+  <script src="/static/media-handler.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
