@@ -131,6 +131,79 @@ class BrowserManager:
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
+    async def _find_element(self, text_or_selector):
+        """Helper to find an element by text, role, label, or css selector."""
+        # Special case: map plain "search" to common search box selectors
+        if text_or_selector.lower() in ("search", "searchbox", "search box"):
+            loc = self.page.get_by_role("searchbox")
+            if await loc.count() > 0: return loc.first
+            loc = self.page.locator("input[type='search'], input[name='search'], input[name='q']")
+            if await loc.count() > 0: return loc.first
+
+        # Try finding as a direct ARIA role
+        try:
+            loc = self.page.get_by_role(text_or_selector)
+            if await loc.count() > 0: return loc.first
+        except Exception:
+            pass
+
+        # Try text full match
+        loc = self.page.get_by_text(text_or_selector, exact=True)
+        if await loc.count() > 0: return loc.first
+        # Try text partial match
+        loc = self.page.get_by_text(text_or_selector)
+        if await loc.count() > 0: return loc.first
+        # Try label
+        loc = self.page.get_by_label(text_or_selector)
+        if await loc.count() > 0: return loc.first
+        # Try placeholder
+        loc = self.page.get_by_placeholder(text_or_selector)
+        if await loc.count() > 0: return loc.first
+        
+        # Try standard input attributes
+        try:
+            loc = self.page.locator(f"input[name='{text_or_selector}'], input[type='{text_or_selector}']")
+            if await loc.count() > 0: return loc.first
+        except Exception:
+            pass
+
+        # Try CSS fallback
+        try:
+            loc = self.page.locator(text_or_selector)
+            if await loc.count() > 0: return loc.first
+        except Exception:
+            pass
+        
+        return None
+
+    async def find_and_click(self, text_or_selector):
+        try:
+            loc = await self._find_element(text_or_selector)
+            if loc:
+                await loc.click(timeout=5000)
+                await asyncio.sleep(0.3)
+                return {"status": "ok", **(await self._page_info())}
+            return {"status": "error", "message": f"Element not found: {text_or_selector}"}
+        except PlaywrightTimeout:
+            return {"status": "error", "message": f"Click on '{text_or_selector}' timed out"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+
+    async def find_and_type(self, text_or_selector, text, press_enter=False):
+        try:
+            loc = await self._find_element(text_or_selector)
+            if loc:
+                await loc.fill(str(text), timeout=5000)
+                if press_enter:
+                    await loc.press("Enter")
+                await asyncio.sleep(0.3)
+                return {"status": "ok", **(await self._page_info())}
+            return {"status": "error", "message": f"Element not found: {text_or_selector}"}
+        except PlaywrightTimeout:
+            return {"status": "error", "message": f"Typing into '{text_or_selector}' timed out"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+
     async def scroll(self, direction, amount=3):
         try:
             amount = int(amount)

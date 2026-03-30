@@ -46,6 +46,24 @@ TOOL_DECLARATIONS = [
             required=["text"],
         ),
         _decl(
+            "find_and_click",
+            "Click an element by its visible text, ARIA label, or CSS selector. Prefer this tool over coordinate-based 'click' when you can identify an element by text.",
+            {
+                "text_or_selector": {"type": "string", "description": "The visible text, label, role, or CSS selector of the element to click."},
+            },
+            required=["text_or_selector"],
+        ),
+        _decl(
+            "find_and_type",
+            "Find an input field by its visible text, placeholder, ARIA label, or CSS selector, and type text into it. Prefer this tool over coordinate-based 'type_text'.",
+            {
+                "text_or_selector": {"type": "string", "description": "The visible text, placeholder, label, role, or CSS selector of the input element."},
+                "text": {"type": "string", "description": "The text to type"},
+                "press_enter": {"type": "boolean", "description": "Press Enter after typing. Default false."},
+            },
+            required=["text_or_selector", "text"],
+        ),
+        _decl(
             "scroll",
             "Scroll the page up or down to see content not visible in the current screenshot.",
             {
@@ -108,6 +126,8 @@ def build_tool_mapping(browser_mgr):
         "navigate": browser_mgr.navigate,
         "click": browser_mgr.click,
         "type_text": browser_mgr.type_text,
+        "find_and_click": browser_mgr.find_and_click,
+        "find_and_type": browser_mgr.find_and_type,
         "scroll": browser_mgr.scroll,
         "go_back": browser_mgr.go_back,
         "go_forward": browser_mgr.go_forward,
